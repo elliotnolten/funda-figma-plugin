@@ -1,46 +1,43 @@
-import * as React from 'react';
-import '../styles/ui.css';
+import * as React from "react";
+import "../styles/ui.css";
+import * as data from "../testDataAmsterdam.json";
 
 declare function require(path: string): any;
 
 const App = ({}) => {
-    const textbox = React.useRef<HTMLInputElement>(undefined);
+    console.log(data.response.docs);
+    const items = data.response.docs;
 
-    const countRef = React.useCallback((element: HTMLInputElement) => {
-        if (element) element.value = '5';
-        textbox.current = element;
-    }, []);
-
-    const onCreate = () => {
-        const count = parseInt(textbox.current.value, 10);
-        parent.postMessage({pluginMessage: {type: 'create-rectangles', count}}, '*');
-    };
-
-    const onCancel = () => {
-        parent.postMessage({pluginMessage: {type: 'cancel'}}, '*');
+    const MessageListener = (event) => {
+        console.log(event.data.pluginMessage);
     };
 
     React.useEffect(() => {
-        // This is how we read messages sent from the plugin controller
-        window.onmessage = (event) => {
-            const {type, message} = event.data.pluginMessage;
-            if (type === 'create-rectangles') {
-                console.log(`Figma Says: ${message}`);
-            }
+        window.addEventListener("message", MessageListener);
+
+        return () => {
+            window.removeEventListener("message", MessageListener);
         };
     }, []);
 
+    const handleSubmit = () => {
+        parent.postMessage(
+            {
+                pluginMessage: {
+                    type: "data",
+                    items: JSON.stringify(items),
+                },
+            },
+            "*"
+        );
+    };
+
     return (
         <div>
-            <img src={require('../assets/logo.svg')} />
-            <h2>Rectangle Creator</h2>
-            <p>
-                Count: <input ref={countRef} />
-            </p>
-            <button id="create" onClick={onCreate}>
+            <h2>Funda</h2>
+            <button id="create" onClick={handleSubmit}>
                 Create
             </button>
-            <button onClick={onCancel}>Cancel</button>
         </div>
     );
 };

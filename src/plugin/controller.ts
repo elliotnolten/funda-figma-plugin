@@ -1,15 +1,26 @@
 figma.showUI(__html__);
 
-figma.ui.onmessage = (msg) => {
-    if (msg.type === 'create-rectangles') {
+let count;
+
+figma.ui.onmessage = async (message) => {
+    if (message.type === "data") {
         const nodes = [];
 
-        for (let i = 0; i < msg.count; i++) {
-            const rect = figma.createRectangle();
-            rect.x = i * 150;
-            rect.fills = [{type: 'SOLID', color: {r: 1, g: 0.5, b: 0}}];
-            figma.currentPage.appendChild(rect);
-            nodes.push(rect);
+        const items = JSON.parse(message.items);
+        count = items.length;
+
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            const adres = item.Adres;
+            const frame = figma.createFrame();
+            frame.x = i * 150;
+            frame.fills = [{type: "SOLID", color: {r: 1, g: 0.5, b: 0}}];
+            const text = figma.createText();
+            frame.appendChild(text);
+            await figma.loadFontAsync({family: "Inter", style: "Regular"});
+            text.characters = adres;
+            figma.currentPage.appendChild(frame);
+            nodes.push(frame);
         }
 
         figma.currentPage.selection = nodes;
@@ -17,8 +28,8 @@ figma.ui.onmessage = (msg) => {
 
         // This is how figma responds back to the ui
         figma.ui.postMessage({
-            type: 'create-rectangles',
-            message: `Created ${msg.count} Rectangles`,
+            type: "create-rectangles",
+            message: `Created ${count} Rectangles`,
         });
     }
 
