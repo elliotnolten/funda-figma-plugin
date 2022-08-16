@@ -5,20 +5,7 @@ import * as data from "../testDataAmsterdam.json";
 declare function require(path: string): any;
 
 const App = ({}) => {
-    console.log(data.response.docs);
     const items = data.response.docs;
-
-    const MessageListener = (event) => {
-        console.log(event.data.pluginMessage);
-    };
-
-    React.useEffect(() => {
-        window.addEventListener("message", MessageListener);
-
-        return () => {
-            window.removeEventListener("message", MessageListener);
-        };
-    }, []);
 
     const handleSubmit = () => {
         parent.postMessage(
